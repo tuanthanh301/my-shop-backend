@@ -72,21 +72,6 @@ const deleteProduct = (id) => {
     }
   });
 };
-
-const getAllProduct = () => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const allProduct = await Product.find()
-      resolve({
-        status: "OK",
-        message: "Success",
-        data: allProduct
-      });
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
 const getDetailsProduct = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -103,6 +88,50 @@ const getDetailsProduct = (id) => {
         status: "OK",
         message: "SUCCESS",
         data: product,
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+const getAllProduct = (limit, page, sort, filter) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const totalProduct = await Product.countDocuments()
+      console.log('filter', filter)
+      if (filter){
+        const label = filter[0]
+        const allProductFilter = await Product.find({ [label]: {'$regex' : filter[1]} }).limit(limit).skip(page * limit)
+        resolve({
+          status: "OK",
+          message: "Success",
+          data: allProductFilter,
+          total: totalProduct,
+          pageCurrent: Number(page + 1),
+          totalPage: Math.ceil(totalProduct / limit)
+        })
+    }
+      if (sort){
+          const objectSort = {}
+          objectSort[sort[1]] = sort[0]
+          const allProductSort = await Product.find().limit(limit).skip(page * limit).sort(objectSort)
+          resolve({
+            status: "OK",
+            message: "Success",
+            data: allProductSort,
+            total: totalProduct,
+            pageCurrent: Number(page + 1),
+            totalPage: Math.ceil(totalProduct / limit)
+          })
+      }
+      const allProduct = await Product.find().limit(limit).skip(page * limit)
+      resolve({
+        status: "OK",
+        message: "Success",
+        data: allProduct,
+        total: totalProduct,
+        pageCurrent: Number(page + 1),
+        totalPage: Math.ceil(totalProduct / limit)
       });
     } catch (e) {
       reject(e);
