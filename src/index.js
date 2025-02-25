@@ -5,17 +5,24 @@ const routes = require('./routes')
 const cors = require('cors')    // Giúp frontend có thể gọi API từ một domain khác mà không bị chặn bởi trình duyệt.
                                 // Tăng cường bảo mật khi chỉ cho phép các domain hoặc phương thức HTTP cụ thể.
 const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
+
 dotenv.config();
 
 const app = express()
 const port = process.env.PORT || 3001;
 
-app.use(cors())
+app.use(cors({
+    origin: "http://localhost:3000", // Chỉ định origin cụ thể
+    credentials: true, // Cho phép gửi cookie và headers xác thực
+  }
+))
 app.use(bodyParser.json())
+app.use(cookieParser())
 
 routes(app);
 
-mongoose.connect(`${process.env.DB_PASSWORD}`)
+mongoose.connect(`${process.env.MONGO_DB}`)
     .then(() => {
         console.log("Connect to DB success!")
     })

@@ -7,7 +7,7 @@ const createUser = async (req,res) => {
         const { name, email, password, confirmPassword, phone } = req.body;  
         const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
         const isCheckEmail = reg.test(email)
-        if (!name || !email || !password || !confirmPassword || !phone) {
+        if (!email || !password || !confirmPassword) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The input is required' 
@@ -35,10 +35,10 @@ const createUser = async (req,res) => {
 } 
 const loginUser = async (req,res) => {
     try {
-        const { name, email, password, confirmPassword, phone } = req.body;  
+        const { email, password  } = req.body;  
         const reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
         const isCheckEmail = reg.test(email)
-        if (!name || !email || !password || !confirmPassword || !phone) {
+        if (!email || !password) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The input is required' 
@@ -48,14 +48,16 @@ const loginUser = async (req,res) => {
                 status: 'ERR',
                 message: 'The input is email' 
             })
-        } else if(password !== confirmPassword){
-            return res.status(200).json({
-                status: 'ERR',
-                message: 'The password is equal confirmPassword' 
-            })
-        }
+        } 
         const response = await UserService.loginUser(req.body);
-        return res.status(200).json(response)
+        const {refresh_token, ...newResponse } = response
+        // console.log('response',response)
+        res.cookie('refresh_token',refresh_token, {
+            httpOnly: true,
+            secure: false,
+            samesite: "strict"
+        })
+        return res.status(200).json(newResponse)
     }catch(e) {
         console.log(e);
         return res.status(404).json({
@@ -136,15 +138,16 @@ const getDetailsUser = async (req,res) => {
     }
 } 
 const refreshToken = async (req,res) => { 
+    console.log('req.cookies.refresh_token',req.cookies.refresh_token)
     try {
-        const token = req.headers.token.split(' ')[1]
+        const token = req.cookies.refresh_token
         if (!token) {
             return res.status(200).json({
                 status: "ERR",
                 message: "The token is required"
             })
         }
-        const response = await JwtService.refreshTokenJwtService(token );
+        const response = await JwtService.refreshTokenJwtService(token);
         return res.status(200).json(response) 
     }catch(e) {
         console.log(e);
