@@ -39,7 +39,8 @@ const updateProduct = (id, data) => {
             message: "The product is not defined",
           });
         }
-        const updatedProduct = await Product.findByIdAndUpdate(id,data, { new: true})
+
+        const updatedProduct = await Product.findByIdAndUpdate(id,data.stateProductDetails, { new: true})
         resolve({
           status: "OK",
           message: "SUCCESS",
@@ -72,6 +73,19 @@ const deleteProduct = (id) => {
     }
   });
 };
+const deleteManyProduct = (ids) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await Product.deleteMany({_id: ids})
+      resolve({
+        status: "OK",
+        message: "Delete product success",
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
 const getDetailsProduct = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -94,44 +108,97 @@ const getDetailsProduct = (id) => {
     }
   });
 };
-const getAllProduct = (limit, page, sort, filter) => {
+// const getAllProduct = (limit = 1000, page, sort, filter) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       const totalProduct = await Product.countDocuments()
+//       if (filter){
+//         const label = filter[0]
+//         const allProductFilter = await Product.find({ [label]: {'$regex' : filter[0]} }).limit(limit).skip(page * limit)
+//         resolve({
+//           status: "OK",
+//           message: "Success",
+//           data: allProductFilter,
+//           total: totalProduct,
+//           pageCurrent: Number(page + 1),
+//           totalPage: Math.ceil(totalProduct / limit)
+//         })
+//     }
+//       if (sort){
+//           const objectSort = {}
+//           objectSort[sort[1]] = sort[0]
+//           const allProductSort = await Product.find().limit(limit).skip(page * limit).sort(objectSort)
+//           resolve({
+//             status: "OK",
+//             message: "Success",
+//             data: allProductSort,
+//             total: totalProduct,
+//             pageCurrent: Number(page + 1),
+//             totalPage: Math.ceil(totalProduct / limit)
+//           })
+//       }
+//       const allProduct = await Product.find().limit(limit).skip(page * limit)
+//       resolve({
+//         status: "OK",
+//         message: "Success",
+//         data: allProduct,
+//         total: totalProduct,
+//         pageCurrent: Number(page + 1),
+//         totalPage: Math.ceil(totalProduct / limit)
+//       });
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
+const getAllProduct = (limit = 1000, page = 0, sort, filter) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const totalProduct = await Product.countDocuments()
-      console.log('filter', filter)
-      if (filter){
-        const label = filter[0]
-        const allProductFilter = await Product.find({ [label]: {'$regex' : filter[1]} }).limit(limit).skip(page * limit)
-        resolve({
-          status: "OK",
-          message: "Success",
-          data: allProductFilter,
-          total: totalProduct,
-          pageCurrent: Number(page + 1),
-          totalPage: Math.ceil(totalProduct / limit)
-        })
-    }
-      if (sort){
-          const objectSort = {}
-          objectSort[sort[1]] = sort[0]
-          const allProductSort = await Product.find().limit(limit).skip(page * limit).sort(objectSort)
-          resolve({
-            status: "OK",
-            message: "Success",
-            data: allProductSort,
-            total: totalProduct,
-            pageCurrent: Number(page + 1),
-            totalPage: Math.ceil(totalProduct / limit)
-          })
+      const query = {};
+
+      // Xử lý filter nếu có
+      if (filter) {
+        const label = filter[0];
+        const value = filter[1];
+        query[label] = { '$regex': value, '$options': 'i' }; // Tìm kiếm không phân biệt hoa thường
       }
-      const allProduct = await Product.find().limit(limit).skip(page * limit)
+
+      // Đếm tổng số sản phẩm (theo điều kiện filter nếu có)
+      const totalProduct = await Product.countDocuments(query);
+
+      // Xử lý sort nếu có
+      const objectSort = {};
+      if (sort) {
+        objectSort[sort[1]] = sort[0];
+      }
+
+      // Lấy danh sách sản phẩm theo filter và sort
+      const allProduct = await Product.find(query)
+        .limit(limit)
+        .skip(page * limit)
+        .sort(objectSort);
+
       resolve({
         status: "OK",
         message: "Success",
         data: allProduct,
         total: totalProduct,
         pageCurrent: Number(page + 1),
-        totalPage: Math.ceil(totalProduct / limit)
+        totalPage: Math.ceil(totalProduct / limit),
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+const getAllType = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const allType = await Product.distinct('type')
+      resolve({
+        status: "OK",
+        message: "Success",
+        data: allType,
       });
     } catch (e) {
       reject(e);
@@ -143,5 +210,7 @@ module.exports = {
   updateProduct,
   getDetailsProduct,
   deleteProduct,
-  getAllProduct
+  getAllProduct,
+  deleteManyProduct,
+  getAllType,
 };

@@ -105,7 +105,7 @@ const updateUser = (id, data) => {
           message: "The email is not defined",
         });
       }
-      const updatedUser = await User.findByIdAndUpdate(id,data, { new: true})
+      const updatedUser = await User.findByIdAndUpdate(id,data.stateUserDetails, { new: true})
       resolve({
         status: "OK",
         message: "SUCCESS",
@@ -129,6 +129,19 @@ const deleteUser = (id) => {
         });
       }
       await User.findByIdAndDelete(id)
+      resolve({
+        status: "OK",
+        message: "Delete user success",
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+const deleteManyUser = (ids) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await User.deleteMany({_id: ids})
       resolve({
         status: "OK",
         message: "Delete user success",
@@ -181,4 +194,5 @@ module.exports = {
   deleteUser,
   getAllUser,
   getDetailsUser,
+  deleteManyUser,
 };

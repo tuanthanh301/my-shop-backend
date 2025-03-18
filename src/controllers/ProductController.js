@@ -24,6 +24,7 @@ const updateProduct = async (req,res) => {
     try {
         const productId = req.params.id
         const data = req.body
+
         if (!productId) {
             return res.status(200).json({
                 status: "OK",
@@ -33,7 +34,7 @@ const updateProduct = async (req,res) => {
         const response = await ProductService.updateProduct(productId,data);
         return res.status(200).json(response)
     }catch(e) {
-        console.log(e);
+
         return res.status(404).json({
                 message: e
             }
@@ -78,10 +79,43 @@ const deleteProduct = async (req,res) => {
         ) 
     }
 }
+const deleteMany = async (req,res) => {
+    console.log('req.body',req.body)
+    try {
+        const ids = req.body.ids
+        if (!ids) {
+            return res.status(200).json({
+                status: "OK",
+                message: "The ids is required"
+            })
+        }
+     
+        const response = await ProductService.deleteManyProduct(ids);
+        return res.status(200).json(response)
+    }catch(e) {
+        console.log(e);
+        return res.status(404).json({
+                message: e
+            }
+        ) 
+    }
+}
 const getAllProduct = async (req,res) => {
     try {
-        const { limit, page, sort, filter} = req.query
-        const response = await ProductService.getAllProduct(Number(limit) || 8, Number(page) || 0 , sort, filter);
+        const { limit, page, sort, filter, search} = req.query
+        const response = await ProductService.getAllProduct(Number(limit) || 1000, Number(page) || 0 , sort, filter,search);
+        return res.status(200).json(response)
+    }catch(e) {
+        console.log(e);
+        return res.status(404).json({ 
+                message: e
+            }
+        ) 
+    }
+} 
+const getAllType = async (req,res) => {
+    try {
+        const response = await ProductService.getAllType();
         return res.status(200).json(response)
     }catch(e) {
         console.log(e);
@@ -97,4 +131,6 @@ module.exports = {
     getDetailsProduct,
     deleteProduct,
     getAllProduct,
+    deleteMany,
+    getAllType,
 }
