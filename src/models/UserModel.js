@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
         // refresh_token: {type: String, required: false},
         address: {type: String},
         avatar: {type: String},
+        city: {type: String},
     },
     {
         timestamps: true
