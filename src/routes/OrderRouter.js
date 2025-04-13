@@ -10,8 +10,4 @@ router.delete('/cancel-order/:id', authUserMiddleWare, OrderController.cancelOrd
 
 
 
-
-
-
-
 module.exports = router

@@ -1,6 +1,6 @@
 const Order = require("../models/OderProduct");
 const Product = require("../models/ProductModel");
-
+const EmailService = require("../services/EmailService");
 const createOrder = (newOrder) => {
   return new Promise(async (resolve, reject) => {
     const {
@@ -14,10 +14,12 @@ const createOrder = (newOrder) => {
       city,
       phone,
       user,
+      isPaid,
+      paidAt,
+      email,
     } = newOrder;
 
     try {
-      console.log("orderItem", { orderItem });
       const promises = orderItem.map(async (order) => {
         const productData = await Product.findOneAndUpdate(
           {
@@ -32,7 +34,6 @@ const createOrder = (newOrder) => {
           },
           { new: true }
         );
-        console.log("productData", productData);
         if (productData) {
           const createdOrder = await Order.create({
             orderItem,
@@ -47,8 +48,11 @@ const createOrder = (newOrder) => {
             shippingPrice,
             totalPrice,
             user: user,
+            isPaid,
+            paidAt,
           });
           if (createdOrder) {
+            await EmailService.sendEmailCreateOrder(email, orderItem);
             return {
               status: "OK",
               message: "SUCCESS",
@@ -123,26 +127,60 @@ const getOrderDetails = (id) => {
     }
   });
 };
-const cancelOrderDetails = (id) =>{
+const cancelOrderDetails = (id, data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const order = await Order.findByIdAndDelete(id)
-      if (order === null) {
+      let order = [];
+      const promises = data.map(async (order) => {
+        const productData = await Product.findOneAndUpdate(
+          {
+            _id: order.product,
+            sold: { $gte: order.amount },
+          },
+          {
+            $inc: {
+              countInStock: +order.amount,
+              sold: -order.amount,
+            },
+          },
+          { new: true }
+        );
+        if (productData) {
+          order = await Order.findByIdAndDelete(id);
+          console.log("order", order);
+          if (order === null) {
+            resolve({
+              status: "ERR",
+              message: "The order is not defined",
+            });
+          }
+        } else {
+          return {
+            status: "OK",
+            message: "ERR",
+            id: order.product,
+          };
+        }
+      });
+      const results = await Promise.all(promises);
+      console.log("results", results);
+      const newData = results && results.filter((item) => item);
+      if (newData.length) {
         resolve({
           status: "ERR",
-          message: "The order is not defined",
+          message: `Sản phẩm với id ${newData.join(",")} không tồn tại`,
         });
       }
       resolve({
         status: "OK",
-        message: "SUCCESS",
+        message: "Success",
         data: order,
       });
     } catch (e) {
       reject(e);
     }
   });
-}
+};
 module.exports = {
   createOrder,
   getAllOrderDetails,
