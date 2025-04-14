@@ -15,11 +15,13 @@ const sendEmailCreateOrder = async ( email, orderItem ) => {
     },
   });
   let listItem = ''
+  const attachImage = []
   orderItem.forEach((order) => {
     listItem += `<div>
                     <div>Bạn đã đặt sản phẩm <b>${order.name} </b>bên dưới với số lượng <b>${order.amount}</b> với giá là: <b>${order.price} VNĐ</b>
                     <div><img src=${order?.image} alt="sản phẩm"/></div> 
                 </div>`
+    attachImage.push({path: order.image})
   })
     let info = await transporter.sendMail({
       from: `"TuanThanhShop" <${process.env.MAIL_ACCOUNT}>`,
@@ -29,6 +31,7 @@ const sendEmailCreateOrder = async ( email, orderItem ) => {
       subject: "Thông báo đơn hàng tại TuanThanhShop ✔", // Subject line
       text: "Hello world?", // plain text body
       html: `<div> <b>Bạn đã đặt hàng thành công tại TuanThanhShop </b></div> ${listItem}`, 
+      attachments: attachImage
     });
 };
 
