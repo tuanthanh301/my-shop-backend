@@ -1,0 +1,7 @@
+# .gitignore
+
+# Bỏ qua thư mục node_modules
+node_modules/
+
+# Bỏ qua file khóa gói npm
+package-lock.json
