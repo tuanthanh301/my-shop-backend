@@ -12,12 +12,31 @@ dotenv.config();
 const app = express()
 const port = process.env.PORT || 3001;
 
+// const allowedOrigins = [
+//     "http://localhost:3000",
+//     "https://my-shop-frontend.vercel.app", // nếu deploy FE lên Vercel
+//     "https://my-shop-backend-y7al.onrender.com" // chính domain backend
+//   ];
+const cors = require("cors");
+
 const allowedOrigins = [
-    "http://localhost:3000",
-    "https://my-shop-frontend.vercel.app", // nếu deploy FE lên Vercel
-    "https://my-shop-backend-y7al.onrender.com" // chính domain backend
-  ];
-  
+  "http://localhost:3000",
+  "https://my-shop-frontend.onrender.com", // Thêm domain của FE thật sự
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Cho phép không có origin (Postman, curl, SSR, ...)
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+
   app.use(cors({
     origin: function (origin, callback) {
       // Cho phép gọi từ Postman hoặc Curl (khi origin là undefined)
