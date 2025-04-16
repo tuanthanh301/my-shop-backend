@@ -12,31 +12,28 @@ dotenv.config();
 const app = express()
 const port = process.env.PORT || 3001;
 
-// const allowedOrigins = [
-//     "http://localhost:3000",
-//     "https://my-shop-frontend.vercel.app", // nếu deploy FE lên Vercel
-//     "https://my-shop-backend-y7al.onrender.com" // chính domain backend
-//   ];
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://my-shop-backend-y7al.onrender.com",
   "https://my-shop-frontend.vercel.app",
-  'my-shop-24iq.vercel.app'
-
+  "https://my-shop-backend-y7al.onrender.com",
+  "https://my-shop-24iq.vercel.app"
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Cho phép không có origin (Postman, curl, SSR, ...)
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin) return callback(null, true); // Cho phép Postman, SSR
+      const cleanedOrigin = origin.replace(/\/$/, ""); // bỏ dấu /
+      if (allowedOrigins.includes(cleanedOrigin)) {
         return callback(null, true);
       }
+      console.log("Blocked by CORS:", origin);
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   })
 );
+
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({limit: '50mb'}));
 app.use(bodyParser.json())
