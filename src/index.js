@@ -20,6 +20,8 @@ const port = process.env.PORT || 3001;
 const allowedOrigins = [
   "http://localhost:3000",
   "https://my-shop-frontend.onrender.com", // Thêm domain của FE thật sự
+  'my-shop-24iq.vercel.app'
+
 ];
 
 app.use(
