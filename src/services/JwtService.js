@@ -8,7 +8,7 @@ const generalAccessToken = async (payload) => {
       ...payload,
     },
     process.env.ACCESS_TOKEN,
-    { expiresIn: "30s" }
+    { expiresIn: "30m" }
   );
   return access_token;
 };
@@ -19,7 +19,7 @@ const generalRefreshToken = async (payload) => {
       ...payload,
     },
     process.env.REFRESH_TOKEN,
-    { expiresIn: "30s" }
+    { expiresIn: "30m" }
   );
   return refresh_token;
 };
