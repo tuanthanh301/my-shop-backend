@@ -147,7 +147,6 @@ const cancelOrderDetails = (id, data) => {
         );
         if (productData) {
           order = await Order.findByIdAndDelete(id);
-          console.log("order", order);
           if (order === null) {
             resolve({
               status: "ERR",
@@ -163,7 +162,6 @@ const cancelOrderDetails = (id, data) => {
         }
       });
       const results = await Promise.all(promises);
-      console.log("results", results);
       const newData = results && results.filter((item) => item);
       if (newData.length) {
         resolve({
