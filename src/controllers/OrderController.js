@@ -36,24 +36,44 @@ const getAllOrderDetails = async (req,res) => {
         ) 
     }
 } 
-const getDetailsOrder = async (req,res) => {
+// const getDetailsOrder = async (req,res) => {
+//     try {
+//         const orderId = req.params.id
+//         if (!orderId) {
+//             return res.status(200).json({
+//                 status: "ERR",
+//                 message: "The userId is required"
+//             })
+//         }
+//         const response = await OrderService.getOrderDetails(orderId);
+//         return res.status(200).json(response)
+//     }catch(e) {
+//         return res.status(404).json({
+//                 message: e
+//             }
+//         ) 
+//     }
+// }
+const getDetailsOrder = async (req, res) => {
     try {
-        const orderId = req.params.id
+        const orderId = req.params.id;
         if (!orderId) {
-            return res.status(200).json({
+            return res.status(400).json({
                 status: "ERR",
-                message: "The userId is required"
-            })
+                message: "The orderId is required"
+            });
         }
+
         const response = await OrderService.getOrderDetails(orderId);
-        return res.status(200).json(response)
-    }catch(e) {
-        return res.status(404).json({
-                message: e
-            }
-        ) 
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(500).json({
+            status: "ERROR",
+            message: e.message || "Internal server error"
+        });
     }
-} 
+};
+
 const cancelOrderDetails = async (req, res) => {
     try {
         const orderId = req.params.id

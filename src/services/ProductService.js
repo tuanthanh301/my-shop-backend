@@ -43,27 +43,53 @@ const createProduct = (newProduct) => {
     }
   });
 };
+// const updateProduct = (id, data) => {
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       const checkProduct = await Product.findOne({
+//         _id: id,
+//       });
+
+//       if (checkProduct === null) {
+//         resolve({
+//           status: "OK",
+//           message: "The product is not defined",
+//         });
+//       }
+
+//       const updatedProduct = await Product.findByIdAndUpdate(
+//         id,
+//         data.stateProductDetails,
+//         { new: true }
+//       );
+//       resolve({
+//         status: "OK",
+//         message: "SUCCESS",
+//         data: updatedProduct,
+//       });
+//     } catch (e) {
+//       reject(e);
+//     }
+//   });
+// };
 const updateProduct = (id, data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const checkProduct = await Product.findOne({
-        _id: id,
-      });
-      if (checkProduct === null) {
-        resolve({
-          status: "OK",
-          message: "The product is not defined",
+      const checkProduct = await Product.findById(id);
+      if (!checkProduct) {
+        return resolve({
+          status: "ERR",
+          message: "Product not found",
         });
       }
 
-      const updatedProduct = await Product.findByIdAndUpdate(
-        id,
-        data.stateProductDetails,
-        { new: true }
-      );
+      const updatedProduct = await Product.findByIdAndUpdate(id, data, {
+        new: true,
+      });
+
       resolve({
         status: "OK",
-        message: "SUCCESS",
+        message: "Update successful",
         data: updatedProduct,
       });
     } catch (e) {
@@ -71,6 +97,7 @@ const updateProduct = (id, data) => {
     }
   });
 };
+
 const deleteProduct = (id) => {
   return new Promise(async (resolve, reject) => {
     try {

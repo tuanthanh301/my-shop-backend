@@ -262,20 +262,22 @@ const createOrder = (newOrder) => {
     }
   });
 };
-const getAllOrder = () => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const allOrder = await Order.find()
-      resolve({
-        status: "OK",
-        message: "Success",
-        data: allOrder
-      });
-    } catch (e) {
-      reject(e);
-    }
-  });
+const getAllOrder = async () => {
+  try {
+    const allOrder = await Order.find().sort({ createdAt: -1 }); // Sắp xếp mới nhất trước
+    return {
+      status: "OK",
+      message: "Success",
+      data: allOrder,
+    };
+  } catch (error) {
+    return {
+      status: "ERROR",
+      message: error.message,
+    };
+  }
 };
+
 module.exports = {
   createOrder,
   getAllOrderDetails,
