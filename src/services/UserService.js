@@ -98,6 +98,8 @@ const updateUser = (id, data) => {
       const checkUser = await User.findOne({
         _id : id
       });
+      console.log('aaaaaaaaaaaaaaaaa',checkUser)
+
       if (checkUser === null) {
         resolve({
           status: "OK",
@@ -105,6 +107,7 @@ const updateUser = (id, data) => {
         });
       }
       const updatedUser = await User.findByIdAndUpdate(id,data.stateUserDetails, { new: true})
+      console.log('aaaaaaaaaaaaaaaaa',updatedUser)
       resolve({
         status: "OK",
         message: "SUCCESS",
