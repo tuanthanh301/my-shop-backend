@@ -98,16 +98,13 @@ const updateUser = (id, data) => {
       const checkUser = await User.findOne({
         _id : id
       });
-      console.log('aaaaaaaaaaaaaaaaa',checkUser)
-
       if (checkUser === null) {
         resolve({
           status: "OK",
           message: "The email is not defined",
         });
       }
-      const updatedUser = await User.findByIdAndUpdate(id,data.stateUserDetails, { new: true})
-      console.log('aaaaaaaaaaaaaaaaa',updatedUser)
+      const updatedUser = await User.findByIdAndUpdate(id,data.data, { new: true})
       resolve({
         status: "OK",
         message: "SUCCESS",

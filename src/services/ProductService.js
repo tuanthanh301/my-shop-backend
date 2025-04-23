@@ -76,6 +76,7 @@ const updateProduct = (id, data) => {
   return new Promise(async (resolve, reject) => {
     try {
       const checkProduct = await Product.findById(id);
+      console.log('11111111111111111111111111111',checkProduct)
       if (!checkProduct) {
         return resolve({
           status: "ERR",
@@ -83,9 +84,10 @@ const updateProduct = (id, data) => {
         });
       }
 
-      const updatedProduct = await Product.findByIdAndUpdate(id, data, {
+      const updatedProduct = await Product.findByIdAndUpdate(id, data.data, {
         new: true,
       });
+      console.log('11111111111111111111111111111',updatedProduct)
 
       resolve({
         status: "OK",
